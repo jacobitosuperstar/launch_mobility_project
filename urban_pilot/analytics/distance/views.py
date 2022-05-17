@@ -30,14 +30,10 @@ def location_distance(
 @require_POST
 def api_distance_between_locations_view(request: HttpRequest) -> JsonResponse:
     """Distance Measurement"""
-    print("MIRAR ACÁ")
-    body = request.body
-    print(body)
-    body = json.load(body)
-    print(body)
-    print(type(body))
-    zip_code_1 = body.get("zip_code_1")
-    zip_code_2 = body.get("zip_code_2")
+    body = request.body.decode('utf-8')
+    body = json.loads(body)
+    zip_code_1 = body.get("data_zip_codes").get("zip_code_1")
+    zip_code_2 = body.get("data_zip_codes").get("zip_code_2")
     distance = location_distance(
         zip_code_1=zip_code_1,
         zip_code_2=zip_code_2,

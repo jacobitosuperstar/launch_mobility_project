@@ -3,6 +3,7 @@
 from user_updater import app
 from .models import User
 
+
 @app.route("/")
 @app.route("/home/")
 def hello():

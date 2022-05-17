@@ -190,8 +190,18 @@ def deleter():
     if form.validate():
         # get user instance
         user_id = form.user_id.data
-        User.query.filter_by(id=user_id).delete()
+        user = User.query.filter_by(id=user_id).first()
+        # sending the delete message
+        rabbit_mq_sender(
+            message={"zip_code": user.zip_code, "operation": "substract"},
+            host="rabbitmq",
+            port="5672",
+            queue_name="location_tracker",
+            routing_key="user.location.tracker",
+            exchange="location.tracker",
+        )
         # deleting the user from the db
+        db.session.delete(user)
         db.session.commit()
         response = {
             "status": 200,
