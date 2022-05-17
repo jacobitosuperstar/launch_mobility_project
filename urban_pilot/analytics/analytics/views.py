@@ -27,7 +27,7 @@ thread.start()
 @require_GET
 def api_ordered_locations_view(request: HttpRequest) -> JsonResponse:
     """Ordered Locations by user ammount"""
-    locations = Locations.objects.all().order_by("users_ammount")
+    locations = Locations.objects.all().order_by("-users_ammount")
     locations_list = [{
         "zip_code": location.zip_code,
         "city": location.city,

@@ -9,9 +9,6 @@ from django.http import (
     HttpRequest,
     JsonResponse,
 )
-from analytics.models import (
-    Locations,
-)
 import pgeocode
 
 
@@ -43,4 +40,3 @@ def api_distance_between_locations_view(request: HttpRequest) -> JsonResponse:
         "distance [km]": distance,
     }
     return JsonResponse(info)
-
