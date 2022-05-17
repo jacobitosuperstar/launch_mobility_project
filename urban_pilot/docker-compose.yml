@@ -1,0 +1,109 @@
+version : "3.8"
+services:
+  # users container
+  users:
+    volumes:
+      - ./users:/appuser
+    build:
+      context: ./users/
+      # dockerfile: ./users/Dockerfile
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:8000"
+    restart: on-failure:3
+    image: users_app:develop
+    command: sh ./command.sh
+    container_name: users-app
+    depends_on:
+      - db
+      - rabbitmq
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 1s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 2024M
+        reservations:
+          cpus: '0.25'
+          memory: 1024M
+  # user information processing
+  user_updater:
+    volumes:
+      - ./user_updater:/appuser
+    build:
+      context: ./user_updater/
+      dockerfile: ./Dockerfile
+    ports:
+      - "5000:5000"
+    restart: on-failure:3
+    image: users_updater:develop
+    command: sh ./command.sh
+    container_name: users-updater
+    depends_on:
+      - db
+      - rabbitmq
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 1s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 2024M
+        reservations:
+          cpus: '0.25'
+          memory: 1024M
+  # user analytics
+  analytics:
+    volumes:
+      - ./analytics:/appuser
+    build:
+      context: ./analytics/
+      # dockerfile: ./users/Dockerfile
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    restart: on-failure:3
+    image: analytics_app:develop
+    command: sh ./command.sh
+    container_name: analytics-app
+    depends_on:
+      - db
+      - rabbitmq
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 1s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 2024M
+        reservations:
+          cpus: '0.25'
+          memory: 1024M
+  # user information processing
+  # database
+  db:
+    container_name: db
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=jacobo
+      - POSTGRES_PASSWORD=mateo
+      - POSTGRES_DB=urban_pilot_users
+  # message broker
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
